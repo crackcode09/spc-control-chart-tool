@@ -1,148 +1,167 @@
 # SPC Control Chart Tool
 
-A Jupyter notebook for generating Statistical Process Control (SPC) charts with process capability analysis. Supports X-bar/R, X-bar/S, and Individuals/Moving Range (I-MR) charts with Excel export.
+A browser-based Statistical Process Control (SPC) tool built with Streamlit. Upload a CSV file, configure your analysis, and instantly generate control charts with full process capability reporting — no software installation required.
+
+Supports X-bar/R, X-bar/S, and Individuals/Moving Range (I-MR) charts with automatic chart type selection, configurable spec limits, and one-click Excel export.
 
 ---
 
 ## Live App
 
-**[https://spcanalysistool.streamlit.app](https://spcanalysistool.streamlit.app)** — open in any browser, no install required.
+**[https://spcanalysistool.streamlit.app](https://spcanalysistool.streamlit.app)**
 
----
-
-## Run the Streamlit App Locally
-
-```bash
-pip install -r requirements.txt
-streamlit run app.py
-```
-
-Upload any CSV with numeric columns. The app auto-selects the chart type based on subgroup size and generates a downloadable Excel report.
-
-### Deploy free on Streamlit Cloud
-
-1. Push this repo to GitHub (already done)
-2. Go to [share.streamlit.io](https://share.streamlit.io)
-3. Connect your GitHub account and select this repo
-4. Set **Main file path** to `app.py`
-5. Click Deploy — anyone with the link can use it instantly, no install required
+Open in any browser — no Python, no Jupyter, no installation needed.
 
 ---
 
 ## Features
 
-- **Three chart types** — automatically suggested based on subgroup size
-- **Interactive controls** — dropdowns and sliders to configure the analysis without editing code
-- **Process capability metrics** — Cp, Cpk, Pp, Ppk calculated and displayed on the chart
-- **Control limit zones** — green (in-control), yellow (warning) shading on X-bar chart
-- **Excel export** — outputs a formatted `.xlsx` file with the chart embedded and a stats summary
+- **Three SPC chart types** — X-bar/R, X-bar/S, and I-MR; auto-selected based on subgroup size
+- **Dual-panel chart** — X-bar (or Individuals) chart on top, R/S/MR companion chart below
+- **Control limit zones** — green shading within control limits, yellow shading in warning zones
+- **Capability indices** — Cp, Cpk (short-term) and Pp, Ppk (long-term) calculated automatically
+- **Process statistics** — mean, short- and long-term sigma, min, max, and observation count
+- **Configurable spec limits** — USL and LSL inputs with sensible defaults (mean ± 3σ)
+- **Excel export** — formatted `.xlsx` report with embedded chart image and subgroup data table
+- **Graceful error handling** — clear messages for malformed files, insufficient data, or invalid inputs
 
 ---
 
 ## Chart Types
 
-| Chart | When it's used | Auto-selected when |
-|---|---|---|
-| X-bar / R | Subgroup means + ranges | n = 2–8 |
-| X-bar / S | Subgroup means + std deviation | n ≥ 9 |
-| I-MR | Individual measurements + moving range | Manual selection only (n = 1 data) |
+| Chart | Description | Auto-selected when |
+| --- | --- | --- |
+| X-bar / R | Subgroup means and ranges | n = 2–8 |
+| X-bar / S | Subgroup means and standard deviations | n ≥ 9 |
+| I-MR | Individual values and moving ranges | Manual selection only |
 
-![Which chart type to use — X-bar/R for n=2-8, X-bar/S for n≥9, I-MR for n=1](screenshots/chart_type.png)
-
----
-
-## Requirements
-
-```bash
-pip install pandas numpy matplotlib ipywidgets openpyxl
-```
-
-| Package | Purpose |
-|---|---|
-| `pandas` | Data loading and manipulation |
-| `numpy` | Subgroup calculations, control limits |
-| `matplotlib` | Chart rendering |
-| `ipywidgets` | Interactive parameter controls |
-| `openpyxl` | Excel file export |
+![Chart type selection guide](screenshots/chart_type.png)
 
 ---
 
-## Usage
+## How to Use
 
-1. **Open** `spc_tool.ipynb` in Jupyter
-2. **Update the file path** in Cell 1 to point to your dataset (CSV with `;` delimiter)
-3. **Run all cells** — interactive controls appear at the top
-4. **Configure your analysis:**
-   - Select the column to analyze
-   - Set subgroup size (chart type auto-selects)
-   - Enter USL and LSL
-5. **Run the remaining cells** to calculate limits and render the chart
-6. **Run the export cell** to save an `.xlsx` report
+1. **Open the app** at [https://spcanalysistool.streamlit.app](https://spcanalysistool.streamlit.app)
+2. **Upload a CSV file** using the sidebar — comma, semicolon, and tab delimiters are supported
+3. **Select the column** to analyze from the dropdown (numeric columns only)
+4. **Set subgroup size** using the slider — chart type auto-selects based on n
+5. **Adjust USL and LSL** if the defaults (mean ± 3σ) do not match your specification
+6. The chart and statistics update instantly — **Download Excel Report** to save results
 
 ---
 
-## Output
+## App Output
 
-### Interactive Controls
+### Capability Indices
 
-Configure your analysis without touching any code:
+| Metric | Description |
+| --- | --- |
+| **Cp** | Process capability — spread relative to tolerance (short-term sigma) |
+| **Cpk** | Process capability accounting for mean centering (short-term sigma) |
+| **Pp** | Process performance — spread relative to tolerance (long-term sigma) |
+| **Ppk** | Process performance accounting for mean centering (long-term sigma) |
 
-![Interactive controls — column selector, chart type, subgroup size, USL/LSL](screenshots/controls.png)
+### Process Statistics
+
+| Metric | Description |
+| --- | --- |
+| **Mean (X̄)** | Grand mean of all subgroup averages |
+| **Sigma ST** | Short-term sigma estimated from within-subgroup variation |
+| **Sigma LT** | Long-term sigma — overall standard deviation of all individual values |
+| **Min / Max** | Minimum and maximum values in the dataset |
+| **Observations** | Total number of data points used in the analysis |
 
 ### Control Chart
 
-X-bar chart (top) and R/S/MR companion chart (bottom) with control limits, spec limits, and a Cp/Cpk stats box:
-
-![X-bar and R control chart with UCL, LCL, USL, LSL and capability stats](screenshots/chart.png)
+- Top panel: X-bar (or Individuals) chart with UCL, LCL, USL, LSL, and a stats annotation box
+- Bottom panel: R, S, or MR companion chart with its own UCL and LCL
 
 ### Excel Export
 
-The exported `.xlsx` file contains a stats summary table and the embedded chart image:
+The downloaded `.xlsx` report contains two sheets:
 
-![Excel export showing stats table and embedded chart](screenshots/excel_export.png)
-
-**Chart includes:**
-- X-bar (or Individuals) control chart with UCL, LCL, USL, LSL
-- R / S / MR companion chart
-- Cp, Cpk, Pp, Ppk stats box
-
-**Excel export includes:**
-- Sheet 1: Stats summary table + embedded chart image
-- Sheet 2: Raw subgroup data (X-bar and R/S/MR values per subgroup)
+| Sheet | Contents |
+| --- | --- |
+| **SPC Report** | Stats summary table (chart type, control limits, spec limits, capability indices) + embedded chart image |
+| **Data** | Per-subgroup X-bar and R/S/MR values |
 
 ---
 
-## SPC Constants Reference
+## Local Development
 
-The notebook includes a full lookup table of SPC control chart constants (A2, A3, D3, D4, B3, B4) for subgroup sizes n = 2 through 25, along with d2 and c4 unbiasing constants used for sigma estimation.
+### Requirements
 
----
+```bash
+pip install -r requirements.txt
+```
 
-## Demo Dataset
+| Package | Version | Purpose |
+| --- | --- | --- |
+| `streamlit` | ≥ 1.33.0 | Web app framework |
+| `pandas` | ≥ 2.0.0 | CSV loading and data manipulation |
+| `numpy` | ≥ 1.26.0 | Subgroup calculations and control limits |
+| `matplotlib` | ≥ 3.8.0 | Chart rendering |
+| `openpyxl` | ≥ 3.1.0 | Excel file export |
+| `pytest` | ≥ 8.0.0 | Unit tests |
 
-The included demo uses the [UCI Wine dataset](https://archive.ics.uci.edu/dataset/109/wine) (178 observations, 13 chemical attributes). Replace with your own manufacturing or process data for real analysis.
+### Run locally
+
+```bash
+streamlit run app.py
+```
+
+### Run tests
+
+```bash
+pytest tests/test_spc_utils.py -v
+```
+
+### Deploy on Streamlit Cloud
+
+1. Fork or push this repo to your GitHub account
+2. Go to [share.streamlit.io](https://share.streamlit.io)
+3. Connect your GitHub account and select this repository
+4. Set **Main file path** to `app.py`
+5. Click **Deploy** — the app is live instantly at a public URL
 
 ---
 
 ## File Structure
 
-```
-spctool.py/
-├── app.py                    # Streamlit web app entry point
-├── spc_utils.py              # SPC calculation logic (chart stats, capability indices)
-├── spc_tool.ipynb            # Original Jupyter notebook
-├── requirements.txt          # Python dependencies
+```text
+spc-control-chart-tool/
+├── app.py                      # Streamlit app — UI, chart rendering, Excel export
+├── spc_utils.py                # SPC calculation logic — chart stats and capability indices
+├── requirements.txt            # Python dependencies
+├── spc_tool.ipynb              # Original Jupyter notebook version
+├── sample_spc_report.xlsx      # Example Excel export output
 ├── .streamlit/
-│   └── config.toml           # Streamlit theme (PBC Linear blue)
+│   └── config.toml             # Streamlit theme configuration
 ├── tests/
-│   └── test_spc_utils.py     # Unit tests for spc_utils
-└── README.md
+│   └── test_spc_utils.py       # Unit tests for spc_utils (6 tests)
+├── screenshots/
+│   └── chart_type.png          # Chart type selection reference
+└── docs/
+    └── plans/                  # Implementation planning documents
 ```
 
 ---
 
-## Notes
+## SPC Methodology
 
-- **Short-term sigma (Cp/Cpk)** is estimated from within-subgroup variation (R-bar/d2 or S-bar/c4)
-- **Long-term sigma (Pp/Ppk)** is the overall standard deviation of all individual values
-- Subgroup data is truncated to the nearest complete subgroup — leftover tail observations are dropped
+- **Short-term sigma (Cp/Cpk)** is estimated from within-subgroup variation using R-bar/d₂ (X-bar/R) or S-bar/c₄ (X-bar/S) — this reflects the process's inherent capability when operating in a stable state.
+- **Long-term sigma (Pp/Ppk)** is the overall standard deviation of all individual measurements — this reflects actual process performance including shifts and drifts over time.
+- **Subgroup truncation** — data is truncated to the nearest complete subgroup; incomplete trailing observations are excluded.
+- **SPC constants** (A2, A3, D3, D4, B3, B4, d2, c4) are tabulated for subgroup sizes n = 2 through 25 per AIAG/Shewhart reference tables.
+
+---
+
+## Demo Dataset
+
+The included demo uses the [UCI Wine dataset](https://archive.ics.uci.edu/dataset/109/wine) (178 observations, 13 chemical attributes). Replace with your own process or manufacturing data for real analysis.
+
+---
+
+## License
+
+[MIT](LICENSE) — free to use, modify, and distribute.
