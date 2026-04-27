@@ -4,6 +4,25 @@ A Jupyter notebook for generating Statistical Process Control (SPC) charts with 
 
 ---
 
+## Run the Streamlit App
+
+```bash
+pip install -r requirements.txt
+streamlit run app.py
+```
+
+Upload any CSV with numeric columns. The app auto-selects the chart type based on subgroup size and generates a downloadable Excel report.
+
+### Deploy free on Streamlit Cloud
+
+1. Push this repo to GitHub (already done)
+2. Go to [share.streamlit.io](https://share.streamlit.io)
+3. Connect your GitHub account and select this repo
+4. Set **Main file path** to `app.py`
+5. Click Deploy — anyone with the link can use it instantly, no install required
+
+---
+
 ## Features
 
 - **Three chart types** — automatically suggested based on subgroup size
@@ -102,8 +121,15 @@ The included demo uses the [UCI Wine dataset](https://archive.ics.uci.edu/datase
 ## File Structure
 
 ```
-py.learning/
-├── spc_tool.ipynb       # Main SPC tool notebook
+spctool.py/
+├── app.py                    # Streamlit web app entry point
+├── spc_utils.py              # SPC calculation logic (chart stats, capability indices)
+├── spc_tool.ipynb            # Original Jupyter notebook
+├── requirements.txt          # Python dependencies
+├── .streamlit/
+│   └── config.toml           # Streamlit theme (PBC Linear blue)
+├── tests/
+│   └── test_spc_utils.py     # Unit tests for spc_utils
 └── README.md
 ```
 
