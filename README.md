@@ -4,7 +4,13 @@ A Jupyter notebook for generating Statistical Process Control (SPC) charts with 
 
 ---
 
-## Run the Streamlit App
+## Live App
+
+**[https://spcanalysistool.streamlit.app](https://spcanalysistool.streamlit.app)** — open in any browser, no install required.
+
+---
+
+## Run the Streamlit App Locally
 
 ```bash
 pip install -r requirements.txt
