@@ -113,6 +113,10 @@ def calculate_imr(values: np.ndarray) -> dict:
 
 def calculate_capability(values: np.ndarray, xbar_bar: float, sigma_st: float,
                           USL: float, LSL: float) -> dict:
+    if len(values) < 2:
+        raise ValueError("Need at least 2 values to compute capability.")
+    if USL <= LSL:
+        raise ValueError(f"USL ({USL}) must be greater than LSL ({LSL}).")
     sigma_lt = np.std(values, ddof=1)
     if sigma_st == 0 or sigma_lt == 0:
         return {'Cp': None, 'Cpk': None, 'Pp': None, 'Ppk': None,
