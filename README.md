@@ -22,6 +22,8 @@ A Jupyter notebook for generating Statistical Process Control (SPC) charts with 
 | X-bar / S | Subgroup means + std deviation | n ≥ 9 |
 | I-MR | Individual measurements + moving range | Manual selection only (n = 1 data) |
 
+![Which chart type to use — X-bar/R for n=2-8, X-bar/S for n≥9, I-MR for n=1](screenshots/chart_type.png)
+
 ---
 
 ## Requirements
