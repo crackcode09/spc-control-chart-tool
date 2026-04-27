@@ -110,7 +110,7 @@ ax1.axhline(LSL,                color="darkred", linewidth=2,   linestyle="-",  
 ax1.fill_between(x, stats["LCL_xbar"], stats["UCL_xbar"], alpha=0.08, color="green")
 ax1.fill_between(x, stats["UCL_xbar"], USL,               alpha=0.08, color="yellow")
 ax1.fill_between(x, LSL,               stats["LCL_xbar"], alpha=0.08, color="yellow")
-_chart_title = {"xbar_r": "X-bar Chart", "xbar_s": "X-bar Chart", "im_r": "Individuals Chart"}
+_chart_title = {"xbar_r": "X-bar / R Chart", "xbar_s": "X-bar / S Chart", "im_r": "Individuals / Moving Range (I-MR) Chart"}
 ax1.set_title(f"{_chart_title[chart_type]} — {column}")
 ax1.set_ylabel(column)
 ax1.legend(loc="upper right", fontsize=7)
