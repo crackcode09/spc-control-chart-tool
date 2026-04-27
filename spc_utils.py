@@ -21,9 +21,9 @@ CONSTANTS = {
     19: {"A2": 0.162, "D3": 0.334, "D4": 1.624, "A3": 0.797, "B3": 0.435, "B4": 1.575},
     20: {"A2": 0.153, "D3": 0.338, "D4": 1.617, "A3": 0.787, "B3": 0.443, "B4": 1.566},
     21: {"A2": 0.145, "D3": 0.341, "D4": 1.611, "A3": 0.779, "B3": 0.451, "B4": 1.557},
-    22: {"A2": 0.135, "D3": 0.344, "D4": 1.604, "A3": 0.769, "B3": 0.459, "B4": 1.548},
-    23: {"A2": 0.126, "D3": 0.347, "D4": 1.598, "A3": 0.761, "B3": 0.467, "B4": 1.541},
-    24: {"A2": 0.118, "D3": 0.350, "D4": 1.593, "A3": 0.753, "B3": 0.473, "B4": 1.534},
+    22: {"A2": 0.138, "D3": 0.344, "D4": 1.604, "A3": 0.769, "B3": 0.459, "B4": 1.548},
+    23: {"A2": 0.128, "D3": 0.347, "D4": 1.598, "A3": 0.761, "B3": 0.467, "B4": 1.541},
+    24: {"A2": 0.121, "D3": 0.350, "D4": 1.593, "A3": 0.753, "B3": 0.473, "B4": 1.534},
     25: {"A2": 0.111, "D3": 0.352, "D4": 1.588, "A3": 0.746, "B3": 0.479, "B4": 1.528},
 }
 
@@ -45,6 +45,10 @@ def auto_select_chart_type(n: int) -> str:
 
 
 def calculate_xbar_r(values: np.ndarray, n: int) -> dict:
+    if n not in CONSTANTS:
+        raise ValueError(f"Subgroup size n={n} must be between 2 and 25.")
+    if len(values) < n:
+        raise ValueError(f"Not enough data: need at least {n} values for subgroup size {n}.")
     c = CONSTANTS[n]
     data = values[:(len(values) // n) * n].reshape(-1, n)
     xbar = data.mean(axis=1)
@@ -65,6 +69,10 @@ def calculate_xbar_r(values: np.ndarray, n: int) -> dict:
 
 
 def calculate_xbar_s(values: np.ndarray, n: int) -> dict:
+    if n not in CONSTANTS:
+        raise ValueError(f"Subgroup size n={n} must be between 2 and 25.")
+    if len(values) < n:
+        raise ValueError(f"Not enough data: need at least {n} values for subgroup size {n}.")
     c = CONSTANTS[n]
     data = values[:(len(values) // n) * n].reshape(-1, n)
     xbar = data.mean(axis=1)
@@ -85,9 +93,11 @@ def calculate_xbar_s(values: np.ndarray, n: int) -> dict:
 
 
 def calculate_imr(values: np.ndarray) -> dict:
-    R = np.abs(np.diff(values))
+    if len(values) < 2:
+        raise ValueError("Need at least 2 values for I-MR chart.")
+    R = np.concatenate([[np.nan], np.abs(np.diff(values))])
     xbar_bar = values.mean()
-    R_bar = R.mean()
+    R_bar = np.nanmean(R)
     return {
         'xbar': values,
         'sub_stat': R,
@@ -104,6 +114,9 @@ def calculate_imr(values: np.ndarray) -> dict:
 def calculate_capability(values: np.ndarray, xbar_bar: float, sigma_st: float,
                           USL: float, LSL: float) -> dict:
     sigma_lt = np.std(values, ddof=1)
+    if sigma_st == 0 or sigma_lt == 0:
+        return {'Cp': None, 'Cpk': None, 'Pp': None, 'Ppk': None,
+                'sigma_st': sigma_st, 'sigma_lt': sigma_lt}
     return {
         'Cp':  (USL - LSL) / (6 * sigma_st),
         'Cpk': min(USL - xbar_bar, xbar_bar - LSL) / (3 * sigma_st),
