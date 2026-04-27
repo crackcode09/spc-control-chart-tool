@@ -104,31 +104,24 @@ def fmt_cap(v):
     return f"{v:.3f}" if v is not None else "N/A"
 
 
-# --- Capability metric cards ---
-st.markdown("**Capability Indices**")
+# --- Stats rows ---
+st.caption("CAPABILITY INDICES")
 col1, col2, col3, col4 = st.columns(4)
 col1.metric("Cp",  fmt_cap(cap["Cp"]))
 col2.metric("Cpk", fmt_cap(cap["Cpk"]))
 col3.metric("Pp",  fmt_cap(cap["Pp"]))
 col4.metric("Ppk", fmt_cap(cap["Ppk"]))
 
-# --- Process statistics ---
-st.markdown("**Process Statistics**")
-s1, s2, s3, s4, s5, s6, s7 = st.columns(7)
+st.divider()
+st.caption("PROCESS STATISTICS")
+s1, s2, s3, s4, s5, s6 = st.columns(6)
 s1.metric("Mean (X̄)",    f"{stats['xbar_bar']:.4f}")
 s2.metric("Sigma ST",     fmt_cap(cap["sigma_st"]))
 s3.metric("Sigma LT",     fmt_cap(cap["sigma_lt"]))
-s4.metric("UCL",          f"{stats['UCL_xbar']:.4f}")
-s5.metric("LCL",          f"{stats['LCL_xbar']:.4f}")
-s6.metric("Subgroups",    str(len(stats["xbar"])))
-s7.metric("Observations", str(len(values)))
-
-st.markdown("**Data Range**")
-r1, r2, r3, r4 = st.columns(4)
-r1.metric("Min",    f"{values.min():.4f}")
-r2.metric("Max",    f"{values.max():.4f}")
-r3.metric("Range",  f"{values.max() - values.min():.4f}")
-r4.metric("Std Dev (overall)", f"{values.std(ddof=1):.4f}")
+s4.metric("Min",          f"{values.min():.4f}")
+s5.metric("Max",          f"{values.max():.4f}")
+s6.metric("Observations", str(len(values)))
+st.divider()
 
 # --- Chart ---
 fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(14, 7))
