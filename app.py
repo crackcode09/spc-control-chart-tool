@@ -20,18 +20,27 @@ st.title("SPC Control Chart Tool")
 # --- Sidebar ---
 with st.sidebar:
     st.header("Settings")
-    uploaded_file = st.file_uploader("Upload CSV", type=["csv"])
-    delimiter = st.selectbox("CSV Delimiter", [",", ";", "\\t"], index=0)
+    uploaded_file = st.file_uploader("Upload File", type=["csv", "xlsx", "xls"])
+    is_excel = uploaded_file is not None and uploaded_file.name.lower().endswith((".xlsx", ".xls"))
+    if not is_excel:
+        delimiter = st.selectbox("CSV Delimiter", [",", ";", "\\t"], index=0)
 
 if uploaded_file is None:
-    st.info("Upload a CSV file to get started.")
+    st.info("Upload a CSV or Excel file to get started.")
     st.stop()
 
-sep = "\t" if delimiter == "\\t" else delimiter
 try:
-    df = pd.read_csv(uploaded_file, sep=sep)
+    if is_excel:
+        xl = pd.ExcelFile(uploaded_file)
+        sheet_names = xl.sheet_names
+        with st.sidebar:
+            sheet = st.selectbox("Sheet", sheet_names) if len(sheet_names) > 1 else sheet_names[0]
+        df = xl.parse(sheet)
+    else:
+        sep = "\t" if delimiter == "\\t" else delimiter
+        df = pd.read_csv(uploaded_file, sep=sep)
 except Exception as e:
-    st.error(f"Could not read CSV file: {e}")
+    st.error(f"Could not read file: {e}")
     st.stop()
 numeric_cols = df.select_dtypes(include=np.number).columns.tolist()
 

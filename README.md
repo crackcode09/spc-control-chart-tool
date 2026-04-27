@@ -42,7 +42,7 @@ Open in any browser — no Python, no Jupyter, no installation needed.
 ## How to Use
 
 1. **Open the app** at [https://spcanalysistool.streamlit.app](https://spcanalysistool.streamlit.app)
-2. **Upload a CSV file** using the sidebar — comma, semicolon, and tab delimiters are supported
+2. **Upload a file** using the sidebar — supports CSV (comma, semicolon, or tab delimited) and Excel (`.xlsx` / `.xls`). For multi-sheet Excel files, a sheet selector appears automatically
 3. **Select the column** to analyze from the dropdown (numeric columns only)
 4. **Set subgroup size** using the slider — chart type auto-selects based on n
 5. **Adjust USL and LSL** if the defaults (mean ± 3σ) do not match your specification
