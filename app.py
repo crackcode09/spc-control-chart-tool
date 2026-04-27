@@ -26,7 +26,51 @@ with st.sidebar:
         delimiter = st.selectbox("CSV Delimiter", [",", ";", "\\t"], index=0)
 
 if uploaded_file is None:
-    st.info("Upload a CSV or Excel file to get started.")
+    st.markdown("""
+## What is this tool?
+
+This is a **Statistical Process Control (SPC) Chart Tool**. SPC is a method used in manufacturing and quality engineering to monitor a process over time and determine whether it is operating within expected variation — or showing signs of a problem.
+
+Upload your process data and this tool will automatically:
+- Plot a **control chart** showing whether your process is stable
+- Calculate **control limits** (UCL/LCL) based on your data
+- Compute **process capability indices** (Cp, Cpk, Pp, Ppk) against your specification limits
+- Generate a **downloadable Excel report** with the chart and a full stats summary
+
+---
+
+## How to get started
+
+| Step | What to do |
+| --- | --- |
+| **1. Upload your data** | Use the sidebar to upload a CSV or Excel file containing your measurements |
+| **2. Select a column** | Pick the numeric column you want to analyze |
+| **3. Set subgroup size** | Choose how many measurements make up one subgroup — the chart type auto-selects |
+| **4. Enter spec limits** | Enter your USL (upper) and LSL (lower) specification limits |
+| **5. Read the chart** | Points outside the red dashed lines (UCL/LCL) indicate an out-of-control condition |
+| **6. Download report** | Click the Download button to save a formatted Excel report |
+
+---
+
+## Chart types
+
+| Chart | Used when | Subgroup size |
+| --- | --- | --- |
+| **X-bar / R** | Tracking subgroup averages and ranges | n = 2–8 |
+| **X-bar / S** | Tracking subgroup averages and std deviation | n ≥ 9 |
+| **I-MR** | Individual measurements, no subgrouping | Manual selection |
+
+---
+
+## What do Cp and Cpk mean?
+
+- **Cp ≥ 1.33** — process spread fits within spec with margin (capable)
+- **Cpk ≥ 1.33** — process is both capable *and* centered within spec
+- **Cp > Cpk** — process is capable but the mean is shifted off-center
+- **Cp or Cpk < 1.0** — process is not capable; defects are likely
+
+> **Pp and Ppk** use the same formulas but with long-term (overall) variation instead of short-term — they reflect actual historical performance rather than potential capability.
+""")
     st.stop()
 
 try:
