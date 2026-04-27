@@ -28,7 +28,11 @@ if uploaded_file is None:
     st.stop()
 
 sep = "\t" if delimiter == "\\t" else delimiter
-df = pd.read_csv(uploaded_file, sep=sep)
+try:
+    df = pd.read_csv(uploaded_file, sep=sep)
+except Exception as e:
+    st.error(f"Could not read CSV file: {e}")
+    st.stop()
 numeric_cols = df.select_dtypes(include=np.number).columns.tolist()
 
 if not numeric_cols:
@@ -45,18 +49,32 @@ with st.sidebar:
         index=["xbar_r", "xbar_s", "im_r"].index(default_chart),
         help="Auto-selected based on subgroup size. Override manually if needed.",
     )
-    USL = st.number_input("USL (Upper Spec Limit)", value=float(df[column].mean() + 3 * df[column].std()))
-    LSL = st.number_input("LSL (Lower Spec Limit)", value=float(df[column].mean() - 3 * df[column].std()))
+    if chart_type == "im_r":
+        st.caption("Subgroup size is not used for I-MR charts.")
+    _col_mean = df[column].mean()
+    _col_std = df[column].std()
+    _usl_default = float(_col_mean + 3 * _col_std) if np.isfinite(_col_mean) and np.isfinite(_col_std) else 0.0
+    _lsl_default = float(_col_mean - 3 * _col_std) if np.isfinite(_col_mean) and np.isfinite(_col_std) else 0.0
+    USL = st.number_input("USL (Upper Spec Limit)", value=_usl_default)
+    LSL = st.number_input("LSL (Lower Spec Limit)", value=_lsl_default)
 
 values = df[column].dropna().values
 
 # --- Calculate stats ---
-if chart_type == "xbar_r":
-    stats = calculate_xbar_r(values, subgroup_size)
-elif chart_type == "xbar_s":
-    stats = calculate_xbar_s(values, subgroup_size)
-else:
-    stats = calculate_imr(values)
+try:
+    if chart_type == "xbar_r":
+        stats = calculate_xbar_r(values, subgroup_size)
+    elif chart_type == "xbar_s":
+        stats = calculate_xbar_s(values, subgroup_size)
+    else:
+        stats = calculate_imr(values)
+except ValueError as e:
+    st.error(f"Cannot compute chart: {e}")
+    st.stop()
+
+if len(stats["xbar"]) == 0:
+    st.error("Not enough data to form even one complete subgroup. Reduce the subgroup size or upload more rows.")
+    st.stop()
 
 try:
     cap = calculate_capability(values, stats["xbar_bar"], stats["sigma_st"], USL, LSL)
@@ -92,7 +110,8 @@ ax1.axhline(LSL,                color="darkred", linewidth=2,   linestyle="-",  
 ax1.fill_between(x, stats["LCL_xbar"], stats["UCL_xbar"], alpha=0.08, color="green")
 ax1.fill_between(x, stats["UCL_xbar"], USL,               alpha=0.08, color="yellow")
 ax1.fill_between(x, LSL,               stats["LCL_xbar"], alpha=0.08, color="yellow")
-ax1.set_title(f"X-bar Chart — {column} ({chart_type})")
+_chart_title = {"xbar_r": "X-bar Chart", "xbar_s": "X-bar Chart", "im_r": "Individuals Chart"}
+ax1.set_title(f"{_chart_title[chart_type]} — {column}")
 ax1.set_ylabel(column)
 ax1.legend(loc="upper right", fontsize=7)
 
@@ -155,10 +174,16 @@ def build_excel(fig, stats, cap, column, chart_type, subgroup_size, USL, LSL):
     buf_out.seek(0)
     return buf_out
 
-excel_buf = build_excel(fig, stats, cap, column, chart_type, subgroup_size, USL, LSL)
-st.download_button(
-    label="Download Excel Report",
-    data=excel_buf,
-    file_name="spc_report.xlsx",
-    mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-)
+try:
+    excel_buf = build_excel(fig, stats, cap, column, chart_type, subgroup_size, USL, LSL)
+except Exception as e:
+    st.warning(f"Excel export unavailable: {e}")
+    excel_buf = None
+
+if excel_buf:
+    st.download_button(
+        label="Download Excel Report",
+        data=excel_buf,
+        file_name="spc_report.xlsx",
+        mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    )
