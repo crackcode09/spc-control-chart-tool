@@ -11,6 +11,7 @@ from spc_utils import (
     calculate_capability,
 )
 from report_utils import build_excel, build_pdf
+from spc_inferences import generate_inferences
 
 st.set_page_config(page_title="SPC Control Chart Tool", layout="wide")
 st.title("SPC Control Chart Tool")
@@ -172,6 +173,13 @@ s3.metric("Sigma LT",     fmt_cap(cap["sigma_lt"]))
 s4.metric("Min",          f"{values.min():.4f}")
 s5.metric("Max",          f"{values.max():.4f}")
 s6.metric("Observations", str(len(values)))
+st.divider()
+
+inferences = generate_inferences(stats, cap, USL, LSL)
+st.caption("PROCESS INFERENCES")
+for b in inferences["bullets"]:
+    st.markdown(f"{b['icon']} {b['text']}")
+st.info(inferences["narrative"])
 st.divider()
 
 # --- Chart ---
