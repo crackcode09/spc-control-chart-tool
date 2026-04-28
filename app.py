@@ -237,10 +237,26 @@ except Exception as e:
     st.warning(f"Excel export unavailable: {e}")
     excel_buf = None
 
+try:
+    pdf_buf = build_pdf(
+        fig, stats, cap, column, chart_type, subgroup_size, USL, LSL, values
+    )
+except Exception as e:
+    st.warning(f"PDF export unavailable: {e}")
+    pdf_buf = None
+
+dl_col1, dl_col2 = st.columns(2)
 if excel_buf:
-    st.download_button(
+    dl_col1.download_button(
         label="Download Excel Report",
         data=excel_buf,
         file_name="spc_report.xlsx",
         mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    )
+if pdf_buf:
+    dl_col2.download_button(
+        label="Download PDF Report",
+        data=pdf_buf,
+        file_name="spc_report.pdf",
+        mime="application/pdf",
     )
