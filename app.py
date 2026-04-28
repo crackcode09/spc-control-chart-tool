@@ -247,7 +247,7 @@ except Exception as e:
 
 try:
     pdf_buf = build_pdf(
-        fig, stats, cap, column, chart_type, subgroup_size, USL, LSL, values
+        fig, stats, cap, column, chart_type, subgroup_size, USL, LSL, values, inferences
     )
 except Exception as e:
     st.warning(f"PDF export unavailable: {e}")

@@ -54,7 +54,7 @@ def build_excel(fig, stats, cap, column, chart_type, subgroup_size, USL, LSL):
     return buf_out
 
 
-def build_pdf(fig, stats, cap, column, chart_type, subgroup_size, USL, LSL, values):
+def build_pdf(fig, stats, cap, column, chart_type, subgroup_size, USL, LSL, values, inferences):
     buf_img = io.BytesIO()
     fig.savefig(buf_img, format="png", dpi=150, bbox_inches="tight")
     buf_img.seek(0)
@@ -144,6 +144,45 @@ def build_pdf(fig, stats, cap, column, chart_type, subgroup_size, USL, LSL, valu
             else:
                 pdf.cell(col_w, row_h, "", border=1)
         pdf.set_y(y + row_h)
+
+    # Inferences section
+    _char_map = {
+        "✅": "[OK]",
+        "⚠️": "[!]",
+        "❌": "[X]",
+        "ℹ️": "[i]",
+        "—": "-",   # em dash —
+        "–": "-",   # en dash –
+        "≥": ">=",  # ≥
+        "≤": "<=",  # ≤
+        "’": "'",   # right single quote '
+        "‘": "'",   # left single quote '
+        "“": '"',   # left double quote "
+        "”": '"',   # right double quote "
+    }
+
+    def _pdf_safe(text):
+        for char, replacement in _char_map.items():
+            text = text.replace(char, replacement)
+        # Final fallback: replace any remaining non-latin-1 character
+        return text.encode("latin-1", errors="replace").decode("latin-1")
+
+
+    pdf.ln(4)
+    pdf.set_font("Helvetica", "B", 10)
+    pdf.cell(0, 6, "Process Inferences", new_x="LMARGIN", new_y="NEXT")
+    pdf.ln(1)
+
+    for b in inferences["bullets"]:
+        pdf.set_font("Helvetica", "", 8)
+        line = _pdf_safe(f"{b['icon']}  {b['text']}")
+        pdf.cell(0, 5, line, new_x="LMARGIN", new_y="NEXT")
+
+    pdf.ln(2)
+    pdf.set_fill_color(240, 240, 240)
+    pdf.set_font("Helvetica", "I", 8)
+    pdf.multi_cell(0, 5, _pdf_safe(inferences["narrative"]), fill=True)
+    pdf.ln(2)
 
     # Footer
     pdf.set_y(pdf.h - 15)
