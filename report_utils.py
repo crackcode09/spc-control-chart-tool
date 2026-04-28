@@ -7,6 +7,28 @@ from fpdf import FPDF
 from openpyxl.drawing.image import Image as XLImage
 
 
+_PDF_CHAR_MAP = {
+    "✅": "[OK]",
+    "⚠️": "[!]",
+    "❌": "[X]",
+    "ℹ️": "[i]",
+    "—": "-",   # em dash
+    "–": "-",   # en dash
+    "≥": ">=",  # ≥
+    "≤": "<=",  # ≤
+    "'": "'",   # left single quote
+    "'": "'",   # right single quote
+    """: '"',   # left double quote
+    """: '"',   # right double quote
+}
+
+
+def _pdf_safe(text: str) -> str:
+    for char, replacement in _PDF_CHAR_MAP.items():
+        text = text.replace(char, replacement)
+    return text.encode("latin-1", errors="replace").decode("latin-1")
+
+
 def build_excel(fig, stats, cap, column, chart_type, subgroup_size, USL, LSL):
     buf_img = io.BytesIO()
     fig.savefig(buf_img, format="png", dpi=150, bbox_inches="tight")
@@ -83,11 +105,11 @@ def build_pdf(fig, stats, cap, column, chart_type, subgroup_size, USL, LSL, valu
     )
     pdf.ln(3)
 
-    # Chart image — full usable width
+    # Chart image - full usable width
     pdf.image(buf_img, x=15, w=page_w)
     pdf.ln(4)
 
-    # Stats table — 3 equal columns
+    # Stats table - 3 equal columns
     def _fmt(v):
         return "N/A" if v is None else f"{v:.4f}"
 
@@ -145,29 +167,12 @@ def build_pdf(fig, stats, cap, column, chart_type, subgroup_size, USL, LSL, valu
                 pdf.cell(col_w, row_h, "", border=1)
         pdf.set_y(y + row_h)
 
+    # Guard against overflowing into the footer
+    min_height_needed = 4 + 6 + 1 + len(inferences["bullets"]) * 5 + 2 + 20 + 2
+    if pdf.get_y() + min_height_needed > pdf.h - 20:
+        pdf.add_page()
+
     # Inferences section
-    _char_map = {
-        "✅": "[OK]",
-        "⚠️": "[!]",
-        "❌": "[X]",
-        "ℹ️": "[i]",
-        "—": "-",   # em dash —
-        "–": "-",   # en dash –
-        "≥": ">=",  # ≥
-        "≤": "<=",  # ≤
-        "’": "'",   # right single quote '
-        "‘": "'",   # left single quote '
-        "“": '"',   # left double quote "
-        "”": '"',   # right double quote "
-    }
-
-    def _pdf_safe(text):
-        for char, replacement in _char_map.items():
-            text = text.replace(char, replacement)
-        # Final fallback: replace any remaining non-latin-1 character
-        return text.encode("latin-1", errors="replace").decode("latin-1")
-
-
     pdf.ln(4)
     pdf.set_font("Helvetica", "B", 10)
     pdf.cell(0, 6, "Process Inferences", new_x="LMARGIN", new_y="NEXT")
