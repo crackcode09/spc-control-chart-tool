@@ -38,8 +38,7 @@ def generate_inferences(stats: dict, cap: dict, USL: float, LSL: float) -> dict:
     xbar = np.asarray(stats.get("xbar", []))
     UCL = stats.get("UCL_xbar", float("inf"))
     LCL = stats.get("LCL_xbar", float("-inf"))
-    sigma_st = cap.get("sigma_st")
-    if len(xbar) == 0 or sigma_st is None:
+    if len(xbar) == 0:
         bullets.append({"icon": "ℹ️", "text": "Stability could not be assessed"})
         narrative_parts.append("Stability could not be assessed.")
     else:

@@ -97,7 +97,7 @@ def test_rule4_consistent():
 
 def test_all_none_cap_no_exception():
     cap = {"Cp": None, "Cpk": None, "Pp": None, "Ppk": None, "sigma_st": None, "sigma_lt": None}
-    result = generate_inferences(_stats(), cap, 11.0, 9.0)
+    result = generate_inferences(_stats(xbar=[]), cap, 11.0, 9.0)
     assert len(result["bullets"]) == 4
     assert all(b["icon"] == "ℹ️" for b in result["bullets"])
 
