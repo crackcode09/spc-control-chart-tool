@@ -78,7 +78,7 @@ def build_pdf(fig, stats, cap, column, chart_type, subgroup_size, USL, LSL, valu
     pdf.set_font("Helvetica", "", 9)
     pdf.cell(
         0, 6,
-        f"Column: {column}   |   Chart: {_chart_label[chart_type]}   |   Date: {datetime.date.today()}",
+        f"Column: {column}   |   Chart: {_chart_label.get(chart_type, chart_type)}   |   Date: {datetime.date.today()}",
         new_x="LMARGIN", new_y="NEXT", align="C",
     )
     pdf.ln(3)
