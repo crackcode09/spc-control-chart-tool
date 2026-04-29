@@ -25,7 +25,6 @@ with st.sidebar:
         delimiter = st.selectbox("CSV Delimiter", [",", ";", "\\t"], index=0)
 
 if uploaded_file is None:
-    st.image("screenshots/appface.png", use_container_width=True)
     st.markdown("""
 ## What is this tool?
 
