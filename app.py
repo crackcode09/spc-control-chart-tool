@@ -257,18 +257,22 @@ except Exception as e:
     st.warning(f"PDF export unavailable: {e}")
     pdf_buf = None
 
-dl_col1, dl_col2 = st.columns(2)
+st.divider()
+st.markdown("#### Download Reports")
+_, dl_col1, dl_col2, _ = st.columns([1, 2, 2, 1])
 if excel_buf:
     dl_col1.download_button(
-        label="Download Excel Report",
+        label="📊  Download Excel Report",
         data=excel_buf,
         file_name="spc_report.xlsx",
         mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        use_container_width=True,
     )
 if pdf_buf:
     dl_col2.download_button(
-        label="Download PDF Report",
+        label="📄  Download PDF Report",
         data=pdf_buf,
         file_name="spc_report.pdf",
         mime="application/pdf",
+        use_container_width=True,
     )
