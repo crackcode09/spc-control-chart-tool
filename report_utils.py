@@ -29,7 +29,7 @@ def _pdf_safe(text: str) -> str:
     return text.encode("latin-1", errors="replace").decode("latin-1")
 
 
-def build_excel(fig, stats, cap, column, chart_type, subgroup_size, USL, LSL):
+def build_excel(fig, stats, cap, column, chart_type, subgroup_size, USL, LSL, report_title="SPC Control Chart Report"):
     buf_img = io.BytesIO()
     fig.savefig(buf_img, format="png", dpi=150, bbox_inches="tight")
     buf_img.seek(0)
@@ -39,6 +39,7 @@ def build_excel(fig, stats, cap, column, chart_type, subgroup_size, USL, LSL):
     ws.title = "SPC Report"
 
     rows = [
+        ["Report Title", report_title],
         ["Column", column],
         ["Chart Type", chart_type],
         ["Subgroup Size", subgroup_size],
@@ -76,7 +77,7 @@ def build_excel(fig, stats, cap, column, chart_type, subgroup_size, USL, LSL):
     return buf_out
 
 
-def build_pdf(fig, stats, cap, column, chart_type, subgroup_size, USL, LSL, values, inferences):
+def build_pdf(fig, stats, cap, column, chart_type, subgroup_size, USL, LSL, values, inferences, report_title="SPC Control Chart Report"):
     buf_img = io.BytesIO()
     fig.savefig(buf_img, format="png", dpi=150, bbox_inches="tight")
     buf_img.seek(0)
@@ -90,7 +91,7 @@ def build_pdf(fig, stats, cap, column, chart_type, subgroup_size, USL, LSL, valu
 
     # Header
     pdf.set_font("Helvetica", "B", 16)
-    pdf.cell(0, 10, "SPC Control Chart Report", new_x="LMARGIN", new_y="NEXT", align="C")
+    pdf.cell(0, 10, _pdf_safe(report_title), new_x="LMARGIN", new_y="NEXT", align="C")
 
     _chart_label = {
         "xbar_r": "X-bar / R Chart",

@@ -117,6 +117,7 @@ with st.sidebar:
     )
     USL = st.number_input("USL (Upper Spec Limit)", value=_usl_default)
     LSL = st.number_input("LSL (Lower Spec Limit)", value=_lsl_default)
+    report_title = st.text_input("Report Title", value="SPC Control Chart Report")
 
 values = df[column].dropna().values
 
@@ -239,7 +240,7 @@ st.pyplot(fig)
 
 try:
     excel_buf = build_excel(
-        fig, stats, cap, column, chart_type, subgroup_size, USL, LSL
+        fig, stats, cap, column, chart_type, subgroup_size, USL, LSL, report_title
     )
 except Exception as e:
     st.warning(f"Excel export unavailable: {e}")
@@ -247,7 +248,7 @@ except Exception as e:
 
 try:
     pdf_buf = build_pdf(
-        fig, stats, cap, column, chart_type, subgroup_size, USL, LSL, values, inferences
+        fig, stats, cap, column, chart_type, subgroup_size, USL, LSL, values, inferences, report_title
     )
 except Exception as e:
     st.warning(f"PDF export unavailable: {e}")
