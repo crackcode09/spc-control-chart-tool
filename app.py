@@ -280,9 +280,9 @@ if pdf_buf:
 st.divider()
 st.markdown(
     "<div style='text-align: center; color: #98B1BE; font-size: 0.85rem;'>"
-    "Built by <strong>Nidhin Dileepkumar</strong> · PBC Linear® Internal Tool · "
+    "Built by <strong>Nidhin Dileepkumar</strong> · Open Source · "
     "Questions or feedback? "
-    "<a href='mailto:nidhin.dileepkumar@pbclinear.com' style='color: #0078E6;'>Get in touch</a>"
+    "<a href='https://github.com/crackcode09/spc-control-chart-tool' style='color: #0078E6;'>View on GitHub</a>"
     "</div>",
     unsafe_allow_html=True,
 )
