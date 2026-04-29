@@ -34,7 +34,8 @@ Upload your process data and this tool will automatically:
 - Plot a **control chart** showing whether your process is stable
 - Calculate **control limits** (UCL/LCL) based on your data
 - Compute **process capability indices** (Cp, Cpk, Pp, Ppk) against your specification limits
-- Generate a **downloadable Excel report** with the chart and a full stats summary
+- Generate **process inferences** — 4-rule diagnostic checks (capability, centering, stability, ST vs LT consistency)
+- Generate **downloadable Excel and PDF reports** with the chart, stats summary, and inferences
 
 ---
 
@@ -46,8 +47,10 @@ Upload your process data and this tool will automatically:
 | **2. Select a column** | Pick the numeric column you want to analyze |
 | **3. Set subgroup size** | Choose how many measurements make up one subgroup — the chart type auto-selects |
 | **4. Enter spec limits** | Enter your USL (upper) and LSL (lower) specification limits |
-| **5. Read the chart** | Points outside the red dashed lines (UCL/LCL) indicate an out-of-control condition |
-| **6. Download report** | Click the Download button to save a formatted Excel report |
+| **5. Set report title** | Optionally enter a custom heading shown on the PDF and Excel reports |
+| **6. Read the chart** | Points outside the red dashed lines (UCL/LCL) indicate an out-of-control condition |
+| **7. Review inferences** | Read the bullet diagnostics and narrative summary below the stats |
+| **8. Download report** | Click Excel or PDF to save a formatted report |
 
 ---
 
