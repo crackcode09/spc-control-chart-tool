@@ -276,3 +276,13 @@ if pdf_buf:
         mime="application/pdf",
         use_container_width=True,
     )
+
+st.divider()
+st.markdown(
+    "<div style='text-align: center; color: #98B1BE; font-size: 0.85rem;'>"
+    "Built by <strong>Nidhin Dileepkumar</strong> · PBC Linear® Internal Tool · "
+    "Questions or feedback? "
+    "<a href='mailto:nidhin.dileepkumar@pbclinear.com' style='color: #0078E6;'>Get in touch</a>"
+    "</div>",
+    unsafe_allow_html=True,
+)
