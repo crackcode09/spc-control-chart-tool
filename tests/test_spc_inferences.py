@@ -98,7 +98,7 @@ def test_rule4_consistent():
 def test_all_none_cap_no_exception():
     cap = {"Cp": None, "Cpk": None, "Pp": None, "Ppk": None, "sigma_st": None, "sigma_lt": None}
     result = generate_inferences(_stats(xbar=[]), cap, 11.0, 9.0)
-    assert len(result["bullets"]) == 4
+    assert len(result["bullets"]) == 5
     assert all(b["icon"] == "ℹ️" for b in result["bullets"])
 
 
@@ -108,6 +108,29 @@ def test_narrative_is_nonempty_string():
     assert len(result["narrative"]) > 20
 
 
-def test_returns_four_bullets():
+def test_returns_five_bullets():
     result = generate_inferences(_stats(), _cap(), 11.0, 9.0)
-    assert len(result["bullets"]) == 4
+    assert len(result["bullets"]) == 5
+
+
+# Rule 5 — Normality
+
+def test_rule5_normality_none():
+    result = generate_inferences(_stats(), _cap(), 11.0, 9.0, normality=None)
+    assert result["bullets"][4]["icon"] == "ℹ️"
+    assert "normality" in result["bullets"][4]["text"].lower()
+
+
+def test_rule5_normal():
+    norm = {"A2": 0.32, "A2_star": 0.33, "p_value": 0.45, "n": 100, "alpha": 0.05, "is_normal": True}
+    result = generate_inferences(_stats(), _cap(), 11.0, 9.0, normality=norm)
+    assert result["bullets"][4]["icon"] == "✅"
+    assert "normal" in result["bullets"][4]["text"].lower()
+
+
+def test_rule5_non_normal():
+    norm = {"A2": 1.83, "A2_star": 1.85, "p_value": 0.001, "n": 100, "alpha": 0.05, "is_normal": False}
+    result = generate_inferences(_stats(), _cap(), 11.0, 9.0, normality=norm)
+    assert result["bullets"][4]["icon"] == "⚠️"
+    assert "non-normal" in result["bullets"][4]["text"].lower()
+    assert "Pp/Ppk" in result["bullets"][4]["text"]
