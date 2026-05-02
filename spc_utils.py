@@ -1,4 +1,5 @@
 import numpy as np
+from scipy import stats as _scipy_stats
 
 CONSTANTS = {
     2:  {"A2": 1.880, "D3": 0,     "D4": 3.267, "A3": 2.659, "B3": 0,     "B4": 3.267},
@@ -108,6 +109,38 @@ def calculate_imr(values: np.ndarray) -> dict:
         'LCL_R': 0.0,
         'sigma_st': R_bar / D2[2],
         'sub_label': 'Moving Range (MR)',
+    }
+
+
+def anderson_darling_test(values: np.ndarray, alpha: float = 0.05) -> dict:
+    values = np.asarray(values, dtype=float)
+    values = values[~np.isnan(values)]
+    n = len(values)
+    if n < 8:
+        raise ValueError(f"Anderson-Darling needs at least 8 values, got {n}.")
+
+    result = _scipy_stats.anderson(values, dist="norm")
+    A2 = float(result.statistic)
+
+    # Stephens (1986) small-sample correction + p-value approximation for normal dist
+    A2_star = A2 * (1.0 + 0.75 / n + 2.25 / (n * n))
+    if A2_star >= 0.6:
+        p = float(np.exp(1.2937 - 5.709 * A2_star + 0.0186 * A2_star ** 2))
+    elif A2_star >= 0.34:
+        p = float(np.exp(0.9177 - 4.279 * A2_star - 1.38 * A2_star ** 2))
+    elif A2_star > 0.2:
+        p = float(1.0 - np.exp(-8.318 + 42.796 * A2_star - 59.938 * A2_star ** 2))
+    else:
+        p = float(1.0 - np.exp(-13.436 + 101.14 * A2_star - 223.73 * A2_star ** 2))
+    p = max(0.0, min(1.0, p))
+
+    return {
+        "A2": A2,
+        "A2_star": float(A2_star),
+        "p_value": p,
+        "n": n,
+        "alpha": alpha,
+        "is_normal": p >= alpha,
     }
 
 

@@ -1,7 +1,8 @@
 import numpy as np
 
 
-def generate_inferences(stats: dict, cap: dict, USL: float, LSL: float) -> dict:
+def generate_inferences(stats: dict, cap: dict, USL: float, LSL: float,
+                        normality: dict = None) -> dict:
     bullets = []
     narrative_parts = []
 
@@ -63,5 +64,22 @@ def generate_inferences(stats: dict, cap: dict, USL: float, LSL: float) -> dict:
     else:
         bullets.append({"icon": "✅", "text": f"Short-term and long-term performance are consistent (Cpk = {cpk:.3f}, Ppk = {ppk:.3f})"})
         narrative_parts.append(f"Short and long-term performance are consistent (Cpk = {cpk:.3f}, Ppk = {ppk:.3f}).")
+
+    # Rule 5 — Normality (Anderson-Darling)
+    if normality is None:
+        bullets.append({"icon": "ℹ️", "text": "Normality not assessed — need ≥8 values"})
+        narrative_parts.append("Normality could not be assessed.")
+    elif normality["is_normal"]:
+        bullets.append({"icon": "✅", "text":
+            f"Data is normal — Anderson-Darling A² = {normality['A2']:.3f}, p = {normality['p_value']:.3f} ≥ 0.05"})
+        narrative_parts.append(
+            f"Data passes the Anderson-Darling normality test (A² = {normality['A2']:.3f}, p = {normality['p_value']:.3f})."
+        )
+    else:
+        bullets.append({"icon": "⚠️", "text":
+            f"Data is non-normal — Anderson-Darling A² = {normality['A2']:.3f}, p = {normality['p_value']:.3f} < 0.05; Cp/Cpk unreliable, use Pp/Ppk"})
+        narrative_parts.append(
+            f"Data fails the Anderson-Darling normality test (A² = {normality['A2']:.3f}, p = {normality['p_value']:.3f}); short-term Cp/Cpk should be interpreted with caution."
+        )
 
     return {"bullets": bullets, "narrative": " ".join(narrative_parts)}

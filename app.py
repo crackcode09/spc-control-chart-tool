@@ -4,6 +4,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import streamlit as st
 from spc_utils import (
+    anderson_darling_test,
     auto_select_chart_type,
     calculate_xbar_r,
     calculate_xbar_s,
@@ -169,13 +170,39 @@ def fmt_cap(v):
     return f"{v:.3f}" if v is not None else "N/A"
 
 
+# --- Normality (Anderson-Darling) ---
+ad = None
+try:
+    if len(values) >= 8:
+        ad = anderson_darling_test(values)
+except Exception as e:
+    st.warning(f"Normality test unavailable: {e}")
+
+if ad is not None:
+    if ad["is_normal"]:
+        st.success(
+            f"**Anderson-Darling Normality Test**  \n"
+            f"A² = {ad['A2']:.4f} | p = {ad['p_value']:.3f} ≥ 0.05 → NORMAL. Cp/Cpk and Pp/Ppk shown."
+        )
+    else:
+        st.warning(
+            f"**Anderson-Darling Normality Test**  \n"
+            f"A² = {ad['A2']:.4f} | p = {ad['p_value']:.3f} < 0.05 → NON-NORMAL. Only Pp/Ppk shown."
+        )
+
 # --- Stats rows ---
 st.caption("CAPABILITY INDICES")
-col1, col2, col3, col4 = st.columns(4)
-col1.metric("Cp",  fmt_cap(cap["Cp"]))
-col2.metric("Cpk", fmt_cap(cap["Cpk"]))
-col3.metric("Pp",  fmt_cap(cap["Pp"]))
-col4.metric("Ppk", fmt_cap(cap["Ppk"]))
+_show_cpk = ad is None or ad["is_normal"]
+if _show_cpk:
+    col1, col2, col3, col4 = st.columns(4)
+    col1.metric("Cp",  fmt_cap(cap["Cp"]))
+    col2.metric("Cpk", fmt_cap(cap["Cpk"]))
+    col3.metric("Pp",  fmt_cap(cap["Pp"]))
+    col4.metric("Ppk", fmt_cap(cap["Ppk"]))
+else:
+    col3, col4 = st.columns(2)
+    col3.metric("Pp",  fmt_cap(cap["Pp"]))
+    col4.metric("Ppk", fmt_cap(cap["Ppk"]))
 
 st.divider()
 st.caption("PROCESS STATISTICS")
@@ -188,7 +215,7 @@ s5.metric("Max",          f"{values.max():.4f}")
 s6.metric("Observations", str(len(values)))
 st.divider()
 
-inferences = generate_inferences(stats, cap, USL, LSL)
+inferences = generate_inferences(stats, cap, USL, LSL, normality=ad)
 st.caption("PROCESS INFERENCES")
 for b in inferences["bullets"]:
     st.markdown(f"{b['icon']} {b['text']}")
