@@ -202,6 +202,8 @@ spc-control-chart-tool/
 
 The included demo uses the [UCI Wine dataset](https://archive.ics.uci.edu/dataset/109/wine) (178 observations, 13 chemical attributes). Replace with your own process or manufacturing data for real analysis.
 
+Aeberhard, S. & Forina, M. (1992). Wine [Dataset]. UCI Machine Learning Repository. https://doi.org/10.24432/C5PC7J.
+
 ---
 
 ## License
